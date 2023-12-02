@@ -374,6 +374,7 @@ impl<'cfg> ToR1cs<'cfg> {
         debug!("Embed var: {}", var.op());
         self.profile_start_term(var.clone());
         let public = matches!(ty, VarType::Inst);
+        // term to constriants happen here
         match var.op() {
             Op::Var(name, Sort::Bool) => {
                 let comp = term![Op::Ite; var.clone(), self.one.0.clone(), self.zero.0.clone()];
@@ -1156,6 +1157,7 @@ pub fn to_r1cs(cs: &Computation, cfg: &CircCfg) -> R1cs {
     }
     debug!("Printing assertions");
     for c in &cs.outputs {
+        // entry is here
         converter.assert(c.clone());
     }
     converter.profile_print();

@@ -10,10 +10,14 @@ pub mod mem;
 pub mod scalarize_vars;
 pub mod sha;
 pub mod tuple;
+pub mod short_int_adj;
 mod visit;
+
+use crate::ir::opt::visit::ProgressAnalysisPass;
 
 use super::term::*;
 
+use im::HashMap;
 use log::{debug, trace};
 
 #[derive(Clone, Debug)]
@@ -50,6 +54,8 @@ pub enum Opt {
     VolatileRam,
     /// Replace challenge terms with random variables
     SkolemizeChallenges,
+    /// minimize adjustments on short integers
+    ShortIntegerAdjustments,
 }
 
 /// Run optimizations on `cs`, in this order, returning the new constraint system.
@@ -135,6 +141,12 @@ pub fn opt<I: IntoIterator<Item = Opt>>(mut cs: Computations, optimizations: I) 
                 }
                 Opt::SkolemizeChallenges => {
                     chall::skolemize_challenges(c);
+                }
+                Opt::ShortIntegerAdjustments => {
+                    let analyzer = short_int_adj::ShortIntegerAdjustmentAnalysis {
+                        adjustment_required: HashMap::default(),
+                    };
+                    analyzer.traverse(c);
                 }
             }
             debug!("After {:?}: {} outputs", i, c.outputs.len());

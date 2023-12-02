@@ -68,6 +68,7 @@ pub enum Op {
     BvBinPred(BvBinPred),
     /// bit-vector n-ary operator
     BvNaryOp(BvNaryOp),
+    // BvNaryOpNotAdjust(BvNaryOp),
     /// bit-vector unary operator
     BvUnOp(BvUnOp),
     /// single-bit bit-vector from a boolean

@@ -228,6 +228,10 @@ fn main() {
             panic!("Missing feature: c");
         }
     };
+    for (key, value) in cs.comps.iter() {
+        // Access the key and value here
+        println!("Key: {}, Value: {:?}", key, value.outputs);
+    }
     let cs = match mode {
         Mode::Opt => opt(
             cs,
@@ -302,6 +306,14 @@ fn main() {
 
             println!("Pre-opt R1cs size: {}", r1cs.constraints().len());
             r1cs = reduce_linearities(r1cs, cfg());
+            // println!("{:?}", r1cs.constraints());
+            for (index, (lc1, lc2, lc3)) in r1cs.constraints().iter().enumerate() {
+                println!("Index: {}", index);
+                println!("{}", r1cs.format_lc(lc1));
+                println!("{}", r1cs.format_lc(lc2));
+                println!("{}", r1cs.format_lc(lc3));
+                println!("");
+            }
 
             println!("Final R1cs size: {}", r1cs.constraints().len());
             let (prover_data, verifier_data) = r1cs.finalize(cs);
