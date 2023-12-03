@@ -133,6 +133,11 @@ impl FixedSizeDist {
                 Op::BvNaryOp(BvNaryOp::Xor),
                 Op::BvNaryOp(BvNaryOp::Add),
                 Op::BvNaryOp(BvNaryOp::Mul),
+                Op::BvNaryOpNotAdjust(BvNaryOp::Or),
+                Op::BvNaryOpNotAdjust(BvNaryOp::And),
+                Op::BvNaryOpNotAdjust(BvNaryOp::Xor),
+                Op::BvNaryOpNotAdjust(BvNaryOp::Add),
+                Op::BvNaryOpNotAdjust(BvNaryOp::Mul),
             ],
             Sort::Field(_) => {
                 vec![

@@ -225,7 +225,7 @@ pub fn fold_cache(node: &Term, cache: &mut TermCache<TTerm>, ignore: &[Op]) -> T
                     _ => None,
                 }
             }
-            Op::BvNaryOp(o) => Some(o.flatten(t.cs().iter().map(c_get))),
+            Op::BvNaryOpNotAdjust(o) | Op::BvNaryOp(o) => Some(o.flatten(t.cs().iter().map(c_get))),
             Op::BvBinPred(p) => {
                 if let (Some(a), Some(b)) = (get(0).as_bv_opt(), get(1).as_bv_opt()) {
                     Some(leaf_term(Op::Const(Value::Bool(match p {

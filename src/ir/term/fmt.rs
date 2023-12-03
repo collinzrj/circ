@@ -161,6 +161,7 @@ impl DisplayIr for Op {
             Op::BvBinOp(a) => write!(f, "{a}"),
             Op::BvBinPred(a) => write!(f, "{a}"),
             Op::BvNaryOp(a) => write!(f, "{a}"),
+            Op::BvNaryOpNotAdjust(a) => write!(f, "{a}"),
             Op::BvUnOp(a) => write!(f, "{a}"),
             Op::BoolToBv => write!(f, "bool2bv"),
             Op::BvExtract(a, b) => write!(f, "(extract {a} {b})"),

@@ -17,7 +17,6 @@ use crate::ir::opt::visit::ProgressAnalysisPass;
 
 use super::term::*;
 
-use im::HashMap;
 use log::{debug, trace};
 
 #[derive(Clone, Debug)]
@@ -143,9 +142,12 @@ pub fn opt<I: IntoIterator<Item = Opt>>(mut cs: Computations, optimizations: I) 
                     chall::skolemize_challenges(c);
                 }
                 Opt::ShortIntegerAdjustments => {
-                    let analyzer = short_int_adj::ShortIntegerAdjustmentAnalysis {
-                        adjustment_required: HashMap::default(),
+                    let mut analyzer = short_int_adj::ShortIntegerAdjustmentAnalysis {
+                        adjustment_required: std::collections::HashMap::new(),
+                        mode: crate::ir::opt::short_int_adj::ShortIntegerAdjustmentAnalysisStage::FirstStage,
                     };
+                    analyzer.traverse(c);
+                    analyzer.mode = crate::ir::opt::short_int_adj::ShortIntegerAdjustmentAnalysisStage::SecondStage;
                     analyzer.traverse(c);
                 }
             }

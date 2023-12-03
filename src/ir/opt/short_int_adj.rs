@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::ir::term::*;
 use super::visit::ProgressAnalysisPass;
 
-enum ShortIntegerAdjustmentAnalysisStage {
+pub enum ShortIntegerAdjustmentAnalysisStage {
     FirstStage,
     SecondStage
 }
@@ -12,7 +12,7 @@ pub struct ShortIntegerAdjustmentAnalysis {
     // bv_graph: HashMap<Term, (bool, usize, Vec<Term>)>,
     pub mode: ShortIntegerAdjustmentAnalysisStage,
     pub adjustment_required: HashMap<Term, bool>,
-    pub constraint_system: Vec<>
+    // pub constraint_system: Vec<>
 }
 
 impl ShortIntegerAdjustmentAnalysis {
@@ -108,7 +108,18 @@ impl ShortIntegerAdjustmentAnalysis {
     }
 
     fn visit_build_constraint_system(&mut self, term: &Term) -> bool {
-        todo!()
+        if self.adjustment_required.contains_key(term) {
+            // if let Value::BitVector(b) = &term.op() {
+            //     b
+            // }
+            // match term.op() {
+            //     Some(bv) => bv.update_adjust(true),
+            //     _ => false,
+            // }
+            return false;
+        } else {
+            return false;
+        };
     }
 }
 

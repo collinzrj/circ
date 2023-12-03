@@ -68,7 +68,7 @@ pub enum Op {
     BvBinPred(BvBinPred),
     /// bit-vector n-ary operator
     BvNaryOp(BvNaryOp),
-    // BvNaryOpNotAdjust(BvNaryOp),
+    BvNaryOpNotAdjust(BvNaryOp),
     /// bit-vector unary operator
     BvUnOp(BvUnOp),
     /// single-bit bit-vector from a boolean
@@ -276,6 +276,7 @@ impl Op {
             Op::BvBinOp(_) => Some(2),
             Op::BvBinPred(_) => Some(2),
             Op::BvNaryOp(_) => None,
+            Op::BvNaryOpNotAdjust(_) => None,
             Op::BvUnOp(_) => Some(1),
             Op::BoolToBv => Some(1),
             Op::BvExtract(_, _) => Some(1),
@@ -1363,7 +1364,7 @@ pub fn eval_op(op: &Op, args: &[&Value], var_vals: &FxHashMap<String, Value>) ->
                 BvUnOp::Neg => -a,
             }
         }),
-        Op::BvNaryOp(o) => Value::BitVector({
+        Op::BvNaryOpNotAdjust(o) | Op::BvNaryOp(o) => Value::BitVector({
             let mut xs = args.iter().map(|a| a.as_bv().clone());
             let f = xs.next().unwrap();
             xs.fold(

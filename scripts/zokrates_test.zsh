@@ -69,7 +69,7 @@ function pf_test_isolate {
 }
 
 # r1cs_test_count ./examples/ZoKrates/pf/mm4_cond.zok 120
-# r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/ecc/edwardsAdd.zok
+r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/ecc/edwardsAdd.zok
 # r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/ecc/edwardsOnCurve.zok
 # r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/ecc/edwardsOrderCheck.zok
 # r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/ecc/edwardsNegate.zok
@@ -82,7 +82,7 @@ function pf_test_isolate {
 # r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/ecc/edwardsScalarMult.zok
 # r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/hashes/mimc7/mimc7R20.zok
 # r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/hashes/pedersen/512bit.zok
-r1cs_test ./test.zok
+# r1cs_test ./test.zok
 
 # pf_test_only_pf sha_temp1
 # pf_test_only_pf sha_rot

@@ -781,7 +781,7 @@ impl<'cfg> ToR1cs<'cfg> {
                         let b = self.get_bool(&bv.cs()[0]).clone();
                         self.set_bv_bits(bv, vec![b]);
                     }
-                    Op::BvNaryOp(o) => match o {
+                    Op::BvNaryOpNotAdjust(o) | Op::BvNaryOp(o) => match o {
                         BvNaryOp::Xor | BvNaryOp::Or | BvNaryOp::And => {
                             let mut bits_by_bv = bv
                                 .cs()
@@ -819,25 +819,38 @@ impl<'cfg> ToR1cs<'cfg> {
                                     (sum, n + extra_width)
                                 }
                                 BvNaryOp::Mul => {
-                                    if bv.cs().len() * n < f_width {
-                                        let z = self.zero.clone() + 1;
-                                        (
-                                            values.into_iter().fold(z, |acc, v| self.mul(acc, v)),
-                                            bv.cs().len() * n,
-                                        )
-                                    } else {
-                                        let z = self.zero.clone() + 1;
-                                        let p = values.into_iter().fold(z, |acc, v| {
-                                            let p = self.mul(acc, v);
-                                            let mut bits = self.bitify("binMul", &p, 2 * n, false);
-                                            bits.truncate(n);
-                                            self.debitify(bits.into_iter(), false)
-                                        });
-                                        (p, n)
+                                    match &bv.op() {
+                                        Op::BvNaryOpNotAdjust(o) => {
+                                            let z = self.zero.clone() + 1;
+                                            (
+                                                values.into_iter().fold(z, |acc, v| self.mul(acc, v)),
+                                                bv.cs().len() * n,
+                                            )
+                                        }
+                                        Op::BvNaryOp(o) => {
+                                            if bv.cs().len() * n < f_width {
+                                                let z = self.zero.clone() + 1;
+                                                (
+                                                    values.into_iter().fold(z, |acc, v| self.mul(acc, v)),
+                                                    bv.cs().len() * n,
+                                                )
+                                            } else {
+                                                let z = self.zero.clone() + 1;
+                                                let p = values.into_iter().fold(z, |acc, v| {
+                                                    let p = self.mul(acc, v);
+                                                    let mut bits = self.bitify("binMul", &p, 2 * n, false);
+                                                    bits.truncate(n);
+                                                    self.debitify(bits.into_iter(), false)
+                                                });
+                                                (p, n)
+                                            }
+                                        }
+                                        _ => unreachable!(),
                                     }
                                 }
                                 _ => unreachable!(),
                             };
+                            //TODO fix bitify
                             let mut bits = self.bitify("arith", &res, width, false);
                             bits.truncate(n);
                             self.set_bv_bits(bv, bits);

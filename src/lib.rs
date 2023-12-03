@@ -2,8 +2,8 @@
 //!
 //! A compiler infrastructure for compiling programs to circuits
 
-#![warn(missing_docs)]
-#![deny(warnings)]
+// #![warn(missing_docs)]
+// #![deny(warnings)]
 
 #[macro_use]
 pub mod ir;

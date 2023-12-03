@@ -34,6 +34,7 @@ fn check_dependencies(t: &Term) -> Vec<Term> {
         Op::BvBinOp(_) => vec![t.cs()[0].clone()],
         Op::BvBinPred(_) => Vec::new(),
         Op::BvNaryOp(_) => vec![t.cs()[0].clone()],
+        Op::BvNaryOpNotAdjust(_) => vec![t.cs()[0].clone()],
         Op::BvUnOp(_) => vec![t.cs()[0].clone()],
         Op::BoolToBv => Vec::new(),
         Op::BvExtract(_, _) => Vec::new(),
@@ -89,6 +90,7 @@ fn check_raw_step(t: &Term, tys: &TypeTable) -> Result<Sort, TypeErrorReason> {
         Op::BvBinOp(_) => Ok(get_ty(&t.cs()[0]).clone()),
         Op::BvBinPred(_) => Ok(Sort::Bool),
         Op::BvNaryOp(_) => Ok(get_ty(&t.cs()[0]).clone()),
+        Op::BvNaryOpNotAdjust(_) => Ok(get_ty(&t.cs()[0]).clone()),
         Op::BvUnOp(_) => Ok(get_ty(&t.cs()[0]).clone()),
         Op::BoolToBv => Ok(Sort::BitVector(1)),
         Op::BvExtract(a, b) => Ok(Sort::BitVector(a - b + 1)),
@@ -273,7 +275,7 @@ pub fn rec_check_raw_helper(oper: &Op, a: &[&Sort]) -> Result<Sort, TypeErrorRea
                 .and_then(|_| eq_or(a, b, ctx))
                 .map(|_| Sort::Bool)
         }
-        (Op::BvNaryOp(_), a) => {
+        (Op::BvNaryOp(_) | Op::BvNaryOpNotAdjust(_), a) => {
             let ctx = "bv nary op";
             all_eq_or(a.iter().cloned(), ctx)
                 .and_then(|t| bv_or(t, ctx))
