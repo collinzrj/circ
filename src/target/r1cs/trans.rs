@@ -851,9 +851,18 @@ impl<'cfg> ToR1cs<'cfg> {
                                 _ => unreachable!(),
                             };
                             //TODO fix bitify
-                            let mut bits = self.bitify("arith", &res, width, false);
-                            bits.truncate(n);
-                            self.set_bv_bits(bv, bits);
+                            match &bv.op() {
+                                Op::BvNaryOpNotAdjust(o) => {
+                                    println!("BvNaryOpNotAdjust should save here");
+                                    self.set_bv_uint(bv, res, width);
+                                }
+                                _ => {
+                                    let mut bits = self.bitify("arith", &res, width, false);
+                                    bits.truncate(n);
+                                    self.set_bv_bits(bv, bits);
+                                }
+                            }
+                
                         }
                     },
                     Op::BvBinOp(o) => {

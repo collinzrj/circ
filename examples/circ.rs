@@ -264,7 +264,6 @@ fn main() {
         }
         Mode::Proof | Mode::ProofOfHighValue(_) => {
             let mut opts = Vec::new();
-
             opts.push(Opt::ScalarizeVars);
             opts.push(Opt::Flatten);
             opts.push(Opt::Sha);
@@ -285,7 +284,14 @@ fn main() {
             opts.push(Opt::Tuple);
             opts.push(Opt::Flatten);
             opts.push(Opt::ConstantFold(Box::new([])));
-            opt(cs, opts)
+            opts.push(Opt::ShortIntegerAdjustments);
+            let cs = opt(cs, opts);
+            for (name, comp) in &cs.comps {
+                for output in comp.outputs() {
+                    println!("cs result {}", output)
+                }
+            }
+            cs
         }
     };
     println!("Done with IR optimization");

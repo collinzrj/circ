@@ -104,7 +104,7 @@ impl ShortIntegerAdjustmentAnalysis {
             Op::Update(_) => todo!(),
             _ => ()
         };
-        true
+        false
     }
 
     fn visit_build_constraint_system(&mut self, term: &Term) -> bool {
@@ -132,11 +132,11 @@ impl ProgressAnalysisPass for ShortIntegerAdjustmentAnalysis {
     }
 }
 
-pub struct ShortIntegerAdjustmentRewrite {
+pub struct ShortIntegerAdjustmentRewriter {
     pub adjustment_required: HashMap<Term, bool>,
 }
 
-impl RewritePass for ShortIntegerAdjustmentRewrite {
+impl RewritePass for ShortIntegerAdjustmentRewriter {
     fn visit<F: Fn() -> Vec<Term>>(
         &mut self,
         computation: &mut Computation,
@@ -147,11 +147,14 @@ impl RewritePass for ShortIntegerAdjustmentRewrite {
             match check(orig) {
                 Sort::BitVector(_) => {
                     match orig.op() {
-                        Op::BvNaryOp(bvop) => Some(term(Op::BvNaryOpNotAdjust(bvop.clone()), rewritten_children())),
+                        Op::BvNaryOp(bvop) => {
+                            println!("not adjust {}", orig);
+                            Some(term(Op::BvNaryOpNotAdjust(bvop.clone()), rewritten_children()))
+                        },
                         _ => None
                     }
                 },
-                _ => panic!("This must be bitvector!")
+                _ => None
             }
         } else {
             None

@@ -13,7 +13,7 @@ pub mod tuple;
 pub mod short_int_adj;
 mod visit;
 
-use crate::ir::opt::visit::ProgressAnalysisPass;
+use crate::ir::opt::visit::{ProgressAnalysisPass, RewritePass};
 
 use super::term::*;
 
@@ -146,9 +146,19 @@ pub fn opt<I: IntoIterator<Item = Opt>>(mut cs: Computations, optimizations: I) 
                         adjustment_required: std::collections::HashMap::new(),
                         mode: crate::ir::opt::short_int_adj::ShortIntegerAdjustmentAnalysisStage::FirstStage,
                     };
+                    println!("check 0");
                     analyzer.traverse(c);
                     analyzer.mode = crate::ir::opt::short_int_adj::ShortIntegerAdjustmentAnalysisStage::SecondStage;
+                    println!("check 1");
                     analyzer.traverse(c);
+                    println!("check 2");
+
+                    let mut rewriter = short_int_adj::ShortIntegerAdjustmentRewriter {
+                        adjustment_required: analyzer.adjustment_required
+                    };
+                    println!("check 3");
+                    rewriter.traverse(c);
+                    println!("check 4")
                 }
             }
             debug!("After {:?}: {} outputs", i, c.outputs.len());
