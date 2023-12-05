@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use crate::ir::term::*;
-use super::visit::ProgressAnalysisPass;
+use super::visit::{ProgressAnalysisPass, RewritePass};
 
 pub enum ShortIntegerAdjustmentAnalysisStage {
     FirstStage,
@@ -128,6 +128,33 @@ impl ProgressAnalysisPass for ShortIntegerAdjustmentAnalysis {
         match self.mode {
             ShortIntegerAdjustmentAnalysisStage::FirstStage => self.visit_annotate_adjustment_required(term),
             ShortIntegerAdjustmentAnalysisStage::SecondStage => self.visit_build_constraint_system(term),
+        }
+    }
+}
+
+pub struct ShortIntegerAdjustmentRewrite {
+    pub adjustment_required: HashMap<Term, bool>,
+}
+
+impl RewritePass for ShortIntegerAdjustmentRewrite {
+    fn visit<F: Fn() -> Vec<Term>>(
+        &mut self,
+        computation: &mut Computation,
+        orig: &Term,
+        rewritten_children: F,
+    ) -> Option<Term> {
+        if !self.adjustment_required.contains_key(orig) {
+            match check(orig) {
+                Sort::BitVector(_) => {
+                    match orig.op() {
+                        Op::BvNaryOp(bvop) => Some(term(Op::BvNaryOpNotAdjust(bvop.clone()), rewritten_children())),
+                        _ => None
+                    }
+                },
+                _ => panic!("This must be bitvector!")
+            }
+        } else {
+            None
         }
     }
 }

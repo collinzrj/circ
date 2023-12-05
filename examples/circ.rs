@@ -307,13 +307,13 @@ fn main() {
             println!("Pre-opt R1cs size: {}", r1cs.constraints().len());
             r1cs = reduce_linearities(r1cs, cfg());
             // println!("{:?}", r1cs.constraints());
-            for (index, (lc1, lc2, lc3)) in r1cs.constraints().iter().enumerate() {
-                println!("Index: {}", index);
-                println!("{}", r1cs.format_lc(lc1));
-                println!("{}", r1cs.format_lc(lc2));
-                println!("{}", r1cs.format_lc(lc3));
-                println!("");
-            }
+            // for (index, (lc1, lc2, lc3)) in r1cs.constraints().iter().enumerate() {
+            //     println!("Index: {}", index);
+            //     println!("{}", r1cs.format_lc(lc1));
+            //     println!("{}", r1cs.format_lc(lc2));
+            //     println!("{}", r1cs.format_lc(lc3));
+            //     println!("");
+            // }
 
             println!("Final R1cs size: {}", r1cs.constraints().len());
             let (prover_data, verifier_data) = r1cs.finalize(cs);

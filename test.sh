@@ -1,0 +1,1 @@
+cargo build --release --features r1cs,smt,zok,bellman --example circ; ./target/release/examples/circ test.zok r1cs --action count
