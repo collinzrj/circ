@@ -228,10 +228,6 @@ fn main() {
             panic!("Missing feature: c");
         }
     };
-    for (key, value) in cs.comps.iter() {
-        // Access the key and value here
-        println!("Key: {}, Value: {:?}", key, value.outputs);
-    }
     let cs = match mode {
         Mode::Opt => opt(
             cs,
@@ -286,11 +282,6 @@ fn main() {
             opts.push(Opt::ConstantFold(Box::new([])));
             opts.push(Opt::ShortIntegerAdjustments);
             let cs = opt(cs, opts);
-            for (name, comp) in &cs.comps {
-                for output in comp.outputs() {
-                    println!("cs result {}", output)
-                }
-            }
             cs
         }
     };

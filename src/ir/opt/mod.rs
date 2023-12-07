@@ -142,23 +142,22 @@ pub fn opt<I: IntoIterator<Item = Opt>>(mut cs: Computations, optimizations: I) 
                     chall::skolemize_challenges(c);
                 }
                 Opt::ShortIntegerAdjustments => {
+                    let mut adjustment_required = std::collections::HashMap::new();
+                    for output in c.outputs() {
+                        adjustment_required.insert(output.clone(), true);
+                    }
                     let mut analyzer = short_int_adj::ShortIntegerAdjustmentAnalysis {
-                        adjustment_required: std::collections::HashMap::new(),
+                        adjustment_required,
                         mode: crate::ir::opt::short_int_adj::ShortIntegerAdjustmentAnalysisStage::FirstStage,
                     };
-                    println!("check 0");
                     analyzer.traverse(c);
                     analyzer.mode = crate::ir::opt::short_int_adj::ShortIntegerAdjustmentAnalysisStage::SecondStage;
-                    println!("check 1");
                     analyzer.traverse(c);
-                    println!("check 2");
 
                     let mut rewriter = short_int_adj::ShortIntegerAdjustmentRewriter {
-                        adjustment_required: analyzer.adjustment_required
+                        adjustment_required: analyzer.adjustment_required,
                     };
-                    println!("check 3");
                     rewriter.traverse(c);
-                    println!("check 4")
                 }
             }
             debug!("After {:?}: {} outputs", i, c.outputs.len());

@@ -811,50 +811,59 @@ impl<'cfg> ToR1cs<'cfg> {
                                 .iter()
                                 .map(|c| self.get_bv_uint(c))
                                 .collect::<Vec<_>>();
+                            let children_widths = bv
+                                .cs()
+                                .iter()
+                                .map(|c| self.get_bv_lit(c).borrow().width)
+                                .collect::<Vec<_>>();
                             let (res, width) = match o {
                                 BvNaryOp::Add => {
-                                    let sum =
-                                        values.into_iter().fold(self.zero.clone(), |s, v| s + &v);
+                                    let child_max_width = children_widths.iter().max().unwrap();
                                     let extra_width = bitsize(bv.cs().len().saturating_sub(1));
-                                    (sum, n + extra_width)
+                                    let max_width = child_max_width + extra_width;
+                                    if max_width < f_width {
+                                        (
+                                            values.into_iter().fold(self.zero.clone(), |s, v| s + &v), 
+                                            max_width
+                                        )
+                                    } else {
+                                        // TODO: this is inefficient
+                                        (
+                                            values.into_iter().fold(self.zero.clone(), |acc, v| {
+                                                let p = acc + &v;
+                                                let mut bits = self.bitify("binMul", &p, n, false);
+                                                bits.truncate(n);
+                                                self.debitify(bits.into_iter(), false)
+                                            }),
+                                            n
+                                        )
+                                    }
                                 }
                                 BvNaryOp::Mul => {
-                                    match &bv.op() {
-                                        Op::BvNaryOpNotAdjust(o) => {
-                                            let z = self.zero.clone() + 1;
-                                            (
-                                                values.into_iter().fold(z, |acc, v| self.mul(acc, v)),
-                                                bv.cs().len() * n,
-                                            )
-                                        }
-                                        Op::BvNaryOp(o) => {
-                                            if bv.cs().len() * n < f_width {
-                                                let z = self.zero.clone() + 1;
-                                                (
-                                                    values.into_iter().fold(z, |acc, v| self.mul(acc, v)),
-                                                    bv.cs().len() * n,
-                                                )
-                                            } else {
-                                                let z = self.zero.clone() + 1;
-                                                let p = values.into_iter().fold(z, |acc, v| {
-                                                    let p = self.mul(acc, v);
-                                                    let mut bits = self.bitify("binMul", &p, 2 * n, false);
-                                                    bits.truncate(n);
-                                                    self.debitify(bits.into_iter(), false)
-                                                });
-                                                (p, n)
-                                            }
-                                        }
-                                        _ => unreachable!(),
+                                    let max_width: usize = children_widths.iter().sum();
+                                    if max_width < f_width {
+                                        let z = self.zero.clone() + 1;
+                                        (
+                                            values.into_iter().fold(z, |acc, v| self.mul(acc, v)),
+                                            max_width,
+                                        )
+                                    } else {
+                                        let z = self.zero.clone() + 1;
+                                        // TODO: maybe this can be improved? but this doesn't happen very much
+                                        let p: TermLc = values.into_iter().fold(z, |acc, v| {
+                                            let p = self.mul(acc, v);
+                                            let mut bits = self.bitify("binMul", &p, n, false);
+                                            bits.truncate(n);
+                                            self.debitify(bits.into_iter(), false)
+                                        });
+                                        (p, n)
                                     }
                                 }
                                 _ => unreachable!(),
                             };
-                            //TODO fix bitify
                             match &bv.op() {
-                                Op::BvNaryOpNotAdjust(o) => {
-                                    println!("BvNaryOpNotAdjust should save here");
-                                    self.set_bv_uint(bv, res, width);
+                                Op::BvNaryOpNotAdjust(_) => {
+                                    self.set_bv_uint(bv, res, width)
                                 }
                                 _ => {
                                     let mut bits = self.bitify("arith", &res, width, false);

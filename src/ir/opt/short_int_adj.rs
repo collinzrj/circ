@@ -28,7 +28,7 @@ impl ShortIntegerAdjustmentAnalysis {
                     // TODO: are these only two not congruent?
                     BvBinOp::Udiv => true,
                     BvBinOp::Urem => true,
-                    _ => false
+                    _ => true
                 };
                 if children_adjustment_required {
                     for child in term.cs() {
@@ -44,20 +44,9 @@ impl ShortIntegerAdjustmentAnalysis {
             Op::BvNaryOp(op) => {
                 let children_adjustment_required = match op {
                     // TODO: check if other also need adjustment
-                    BvNaryOp::Add => {
-                        let children_size_list: Vec<usize> = term.cs().iter()
-                            .map(|bv| {
-                                if let Sort::BitVector(n) = check(bv) {
-                                    n
-                                } else {
-                                    panic!("{} is not a bit-vector in embed_bv", bv);
-                                }
-                            })
-                            .collect();
-                        // should adjust if size are not all the same
-                        !children_size_list.iter().all(|&item| item == children_size_list[0])
-                    },
-                    _ => false
+                    BvNaryOp::Add => false,
+                    BvNaryOp::Mul => false,
+                    _ => true
                 };
                 if children_adjustment_required {
                     for child in term.cs() {
@@ -66,16 +55,28 @@ impl ShortIntegerAdjustmentAnalysis {
                 }
             },
             // TODO: what does this do?
-            Op::BvExtract(_, _) => todo!(),
+            Op::BvExtract(_, _) => {
+                for child in term.cs() {
+                    self.adjustment_required.insert(child.clone(), true);
+                }
+            },
             Op::BvConcat => {
                 for child in term.cs() {
                     self.adjustment_required.insert(child.clone(), true);
                 }
             },
             // TODO: what does this do?
-            Op::BvUext(_) => todo!(),
+            Op::BvUext(_) => {
+                for child in term.cs() {
+                    self.adjustment_required.insert(child.clone(), true);
+                }
+            },
             // TODO: what does this do?
-            Op::BvSext(_) => todo!(),
+            Op::BvSext(_) => {
+                for child in term.cs() {
+                    self.adjustment_required.insert(child.clone(), true);
+                }
+            },
             Op::BvToFp => {
                 for child in term.cs() {
                     self.adjustment_required.insert(child.clone(), true);
@@ -102,7 +103,7 @@ impl ShortIntegerAdjustmentAnalysis {
             Op::Array(_, _) => todo!(),
             Op::Tuple => todo!(),
             Op::Update(_) => todo!(),
-            _ => ()
+            _ => (),
         };
         false
     }
@@ -148,7 +149,6 @@ impl RewritePass for ShortIntegerAdjustmentRewriter {
                 Sort::BitVector(_) => {
                     match orig.op() {
                         Op::BvNaryOp(bvop) => {
-                            println!("not adjust {}", orig);
                             Some(term(Op::BvNaryOpNotAdjust(bvop.clone()), rewritten_children()))
                         },
                         _ => None
