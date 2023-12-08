@@ -45,9 +45,11 @@ use circ::target::r1cs::{
 };
 #[cfg(feature = "r1cs")]
 use circ::target::r1cs::{opt::reduce_linearities, trans::to_r1cs};
+use std::fs;
 #[cfg(feature = "smt")]
 use circ::target::smt::find_model;
 use circ_fields::FieldT;
+use circ_opt::clap::ArgAction;
 use fxhash::FxHashMap as HashMap;
 #[cfg(feature = "lp")]
 use good_lp::default_solver;
@@ -76,6 +78,12 @@ struct Options {
 
     #[structopt(subcommand)]
     backend: Backend,
+
+    #[arg(short, long, action(ArgAction::SetTrue))]
+    short_int_adj: bool,
+
+    #[arg(short, long, action(ArgAction::SetTrue))]
+    write_output: bool,
 }
 
 #[derive(Debug, Args)]
@@ -280,7 +288,9 @@ fn main() {
             opts.push(Opt::Tuple);
             opts.push(Opt::Flatten);
             opts.push(Opt::ConstantFold(Box::new([])));
-            opts.push(Opt::ShortIntegerAdjustments);
+            if options.short_int_adj{
+                opts.push(Opt::ShortIntegerAdjustments);
+            }
             let cs = opt(cs, opts);
             cs
         }
@@ -301,7 +311,9 @@ fn main() {
             trace!("IR: {}", circ::ir::term::text::serialize_computation(cs));
             let mut r1cs = to_r1cs(cs, cfg());
 
-            println!("Pre-opt R1cs size: {}", r1cs.constraints().len());
+            let pre_size = r1cs.constraints().len();
+            println!("Pre-opt R1cs size: {}", pre_size);
+
             r1cs = reduce_linearities(r1cs, cfg());
             // println!("{:?}", r1cs.constraints());
             // for (index, (lc1, lc2, lc3)) in r1cs.constraints().iter().enumerate() {
@@ -311,8 +323,16 @@ fn main() {
             //     println!("{}", r1cs.format_lc(lc3));
             //     println!("");
             // }
+            let opt_size = r1cs.constraints().len();
+            println!("Final R1cs size: {}", opt_size);
+            if options.write_output{
+                let mut data_file = std::fs::OpenOptions::new()
+                    .append(true)
+                    .open("short_int_adj_benchmark.txt")
+                    .expect("cannot open file");
+                let _ = data_file.write(format!("{}, {}\n", pre_size, opt_size).as_bytes());
+            }
 
-            println!("Final R1cs size: {}", r1cs.constraints().len());
             let (prover_data, verifier_data) = r1cs.finalize(cs);
             match action {
                 ProofAction::Count => (),

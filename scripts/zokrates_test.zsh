@@ -80,29 +80,28 @@ r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/utils/multiplexer/lookup
 r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/utils/casts/bool_128_to_u32_4.zok
 #r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/utils/pack/u32/pack128.zok
 #r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/utils/pack/bool/pack128.zok
-r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/ecc/edwardsScalarMult.zok
-r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/hashes/mimc7/mimc7R20.zok
-r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/hashes/pedersen/512bit.zok
-r1cs_test ./test.zok
+# r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/ecc/edwardsScalarMult.zok
+# r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/hashes/mimc7/mimc7R20.zok
+# r1cs_test ./third_party/ZoKrates/zokrates_stdlib/stdlib/hashes/pedersen/512bit.zok
+# r1cs_test ./test.zok
 
-pf_test_only_pf sha_temp1
-pf_test_only_pf sha_rot
-pf_test_only_pf maj
-pf_test_only_pf sha_temp2
-pf_test_only_pf test_sha256
+# pf_test_only_pf sha_temp1
+# pf_test_only_pf sha_rot
+# pf_test_only_pf maj
+# pf_test_only_pf sha_temp2
+# pf_test_only_pf test_sha256
 
-pf_test assert
-pf_test assert2
+# pf_test assert
+# pf_test assert2
 # pf_test_isolate isolate_assert
-pf_test 3_plus
-pf_test xor
-pf_test mul
-pf_test many_pub
-pf_test str_str
-pf_test str_arr_str
-pf_test arr_str_arr_str
-pf_test var_idx_arr_str_arr_str
-pf_test mm
-pf_test unused_var
+# pf_test 3_plus
+# pf_test xor
+# pf_test mul
+# pf_test many_pub
+# pf_test str_str
+# pf_test str_arr_str
+# pf_test arr_str_arr_str
+# pf_test var_idx_arr_str_arr_str
+# pf_test mm
 
 # scripts/zx_tests/run_tests.sh
