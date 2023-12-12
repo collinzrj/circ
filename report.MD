@@ -1,3 +1,15 @@
+## Link to the project
+We are currently working on creating a PR to include the change to the project. At this point, the best way to see the changes we have made is via this link which compares the latest commit with the commit before our changes https://github.com/collinzrj/circ/compare/a26533baadfd674f7d7d766b995a9a78a02d4ebd..61fb7c0ee2946cf84b92d962236ffe9533cb6c53
+
+We mainly make changes to these files
+```
+## The new optimization pass is implemented in these two files
+src/ir/opt/mod.rs
+src/ir/opt/short_int_adj.rs
+## The logic to handle non-adjust operations in the constraint generation system
+src/target/r1cs/trans.rs
+```
+
 ## Background
 [CirC](https://github.com/circify/circ) is a compiler that compiles high level languages {C, ZoKrates, Circom} to (state-free, non-uniform, existentially quantified) circuits {SMT, ILP, R1CS, MPC} for SMT solver, zero-knowledge proof, multiparty computations, and more. To be more specific, it converts a program's source code into a set of mathematical constraints represented by vectors of variables. Optimization of such compilers primarily focus on reducing the size of the constraint system: having fewer constraints reduces the workload for creating proofs, and might also result in shorter proofs to verify. The typical formalism adopted by the majority of proof systems is rank-1 constraint system (R1CS). In an R1CS instance C, there exists a collection of constraints over a finite field F, often a prime p, or in other words, a circuit of additions and multiplications gates mod p. One significant cost of such system is introduced by arithmetic operations. Assume an underlying prime number p and operations such as multiplication done over p′, to obtain a correct result, a remainder operation is always applied on the result to adjust bitwidth and avoid overflow, which leads to a number of constraints that are at least equal to the bitwidth of the result, as it requires at least one split gate. Our project aims to apply a heuristic approach to optimize the translation of arithmetic operations. 
 
@@ -30,7 +42,7 @@ The hardest part is to make sure the compiler works properly using our newly int
 
 ## Empirical evaluation
 We uses two types of tests. 
-1. We use the existing benchmarks in the circ repo to test whether the output of the optimized compiler is correct. When applying our compiler in the existing test suite, it generates correct R1CS constraints, which is used to generate correct proofs and is verified successfully.
+1. We use the existing benchmarks in the circ repo to test whether the output of the optimized compiler is correct. Our implementation passed all the test cases in CirC.
 2. To measure how well the proposed design improves the system, we use the number of r1cs constraints generated as the metrics. We runs our compiler and the original one over a set of zokrates programs in [CirC](https://github.com/circify/circ) and [Zombie](https://github.com/PepperSieve/Zombie/tree/master) and compares the number of constraints generated. Here is a shorted list of tests we run. The first line are the numbers of constraints with our flexible adjustment implementation and the second line is the result using original compiler.
 ```
 ../Zombie/circ/zkmb/shaRound.zok
