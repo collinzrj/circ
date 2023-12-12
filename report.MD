@@ -1,3 +1,16 @@
++++
+title = "CirC Bitwidth Adjustment Implementation"
+[extra]
+bio = """
+  Collin Zhang and Melinda Fang are students at Cornell
+"""
+[[extra.authors]]
+name = "Collin Zhang"
+link = "https://collinzrj.github.io/"  # Links are optional.
+[[extra.authors]]
+name = "Melinda Fang"
++++
+
 ## Link to the project
 We are currently working on creating a PR to include the change to the project. At this point, the best way to see the changes we have made is via this link which compares the latest commit with the commit before our changes https://github.com/collinzrj/circ/compare/a26533baadfd674f7d7d766b995a9a78a02d4ebd..61fb7c0ee2946cf84b92d962236ffe9533cb6c53
 
