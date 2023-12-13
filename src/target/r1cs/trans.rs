@@ -831,6 +831,7 @@ impl<'cfg> ToR1cs<'cfg> {
                                         (
                                             values.into_iter().fold(self.zero.clone(), |acc, v| {
                                                 let p = acc + &v;
+                                                // TODO: there is a bug here, n should be no less than width of p, so n should be sum of acc and v width, change
                                                 let mut bits = self.bitify("binMul", &p, n, false);
                                                 bits.truncate(n);
                                                 self.debitify(bits.into_iter(), false)
