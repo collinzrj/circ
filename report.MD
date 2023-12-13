@@ -47,3 +47,11 @@ We uses two types of tests.
 32466, 31422
 51658, 50105
 ```
+## How to run the code
+To run the r1cs compiler, first run this command to build circ
+`cargo build --release --features r1cs,smt,zok,bellman --example circ`
+Then you could pass a .zk file and convert it into linear constraints
+This command counts the number of constraints produced by using our short integer adjustment optimization.
+`./target/release/examples/circ <path to .zk file> --short-int-adj r1cs --action count`
+For more commands please check out our [test script](https://github.com/collinzrj/circ/blob/61fb7c0ee2946cf84b92d962236ffe9533cb6c53/scripts/short_int_adj_test.zsh)
+
